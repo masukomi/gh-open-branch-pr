@@ -1,9 +1,9 @@
-#+title: Readme
+#+title: gh open-branch-pr
 
 * Overview
-Allows you to easily open the PR associated with the current Git branch.
+This tool you to easily open the PR associated with the current Git branch, by just invoking the command.
 
-Assumes that there is a unique identifier for the work that can be found in the branch name and the PR title. Typically this would be a ticket number.
+It assumes that there is a unique identifier for the work that can be found in the branch name and the PR title. Typically this would be a ticket number.
 
 * Requirements
 - Ruby: any vaguely modern version should be fine).
