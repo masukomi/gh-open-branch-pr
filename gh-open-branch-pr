@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+INSTRUCTIONS =<<END
+gh-open-branch-pr assumes two things:
+1. there's a way to extract the current ticket id from
+ your current branch.
+2. you have a script/tool that can extract that.
+
+You'll need to tell gh-open-branch-pr how to run that.
+To do that run
+git config gh-open-pr.ticket-command "<your script invocation>"
+
+gh-open-branch-pr will then execute whatever command you store there.
+END
+
+def get_selection(valid_numbers)
+  number=gets.strip.to_i
+  if valid_numbers.include? number
+    return number
+  else
+    STDERR.puts "That wasn't one of the choices. Try again."
+    exit 1
+  end
+end
+
+ticket_command = `git config --get gh-open-pr.ticket-command`.strip
+if ticket_command == ""
+  STDERR.puts INSTRUCTIONS
+  exit 1
+end
+
+ticket = `#{ticket_command}`.strip
+if ticket == ""
+  STDERR.puts "running \"#{ticket_command}\" didn't give me a ticket id."
+  exit 1
+end
+
+require 'json'
+
+prs_list=JSON.parse(`gh pr list --json "number,title"`)
+
+matches = prs_list.select{|hash| hash["title"].downcase.include? ticket.downcase }
+valid_numbers = matches.map{|m| m["number"]}
+
+if matches.size > 1
+  puts "There were multiple matches. Please enter the number of the one you'd like to open."
+  matches.each do | match |
+    puts "#{match["number"]}: #{match["title"]}"
+  end
+
+  number=get_selection(valid_numbers)
+  `gh pr view --web #{number}`
+elsif matches.size == 1
+  `gh pr view --web #{matches[0]["number"]}`
+
+else
+  STDERR.puts "No open PRs have \"#{ticket}\" in their title."
+  exit 0
+end

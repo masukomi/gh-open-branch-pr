@@ -1,0 +1,49 @@
+#+title: Readme
+
+* Overview
+Allows you to easily open the PR associated with the current Git branch.
+
+Assumes that there is a unique identifier for the work that can be found in the branch name and the PR title. Typically this would be a ticket number.
+
+* Requirements
+- Ruby: any vaguely modern version should be fine).
+- [[https://github.com/cli/cli#readme][GitHub CLI (gh)]]
+- Git
+
+Requires you to have some script that can extract the identifier from your current branch name.
+
+I don't know what your Ticket numbers look like, or if any translation needs to be made when putting it into your branch naming convention. Thus, I can't encode it in this tool. Sorry.
+
+* Installation
+
+#+begin_src shell
+gh extension install masukomi/gh-open-branch-pr
+#+end_src
+
+** Configuration
+If you will be using the same tool to extract ticket numbers for every repo on this machine:
+
+#+begin_src shell
+git config --global gh-open-pr.ticket-command "<your script invocation>"
+#+end_src
+
+If different repos have different ticket patterns then run the same command, but without the =--global= in each repo you want to use this tool in:
+
+#+begin_src shell
+git config gh-open-pr.ticket-command "<your script invocation>"
+#+end_src
+
+For Example. We use Jira at my job, and I wrote a little =jira= utility script that, amongst other things can extract the ticket number from my current branch if run =jira -bt= In each of my work repos I have run this:
+
+#+begin_src shell
+git config gh-open-pr.ticket-command "jira -bt"
+#+end_src
+
+
+* Usage
+
+After configuring your ticket command (see above), you can run the following and it should find open tickets associated with your PR. If there's only one, it'll open it. If there are more (maybe the same ticket appears in multiple PRs) it'll ask you which one to open.
+
+#+begin_src shell
+gh open-branch-pr
+#+end_src
